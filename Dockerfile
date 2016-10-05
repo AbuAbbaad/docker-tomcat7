@@ -1,7 +1,6 @@
 # A vanilla Tomcat 7 Docker container running under OpenJDK 7.
 
 FROM ubuntu:14.04
-MAINTAINER Rob Hasselbaum <rob@hasselbaum.net>
 
 # Install Tomcat and create private CATALINA_BASE at '/tomcat' owned by the Tomcat user.
 # Although Ubuntu creates a "tomcat7" user, we create our own (called "tcuser") so that 
@@ -9,8 +8,9 @@ MAINTAINER Rob Hasselbaum <rob@hasselbaum.net>
 # filesystem write access is limited to CATALINA_BASE.
 RUN DEBIAN_FRONTEND=noninteractive \
  apt-get update && \
- apt-get install -y openjdk-7-jre-headless tomcat7 tomcat7-user && \
- groupadd -g 9000 tcuser && \
+ apt-get install -y openjdk-7-jre-headless tomcat7 tomcat7-user
+
+RUN groupadd -g 9000 tcuser && \
  useradd -d /tomcat -r -s /bin/false -g 9000 -u 9000 tcuser && \ 
  tomcat7-instance-create /tomcat && \
  chown -R tcuser:tcuser /tomcat
