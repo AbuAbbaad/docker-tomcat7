@@ -1,19 +1,20 @@
 # A vanilla Tomcat 7 Docker container running under OpenJDK 7.
 
-FROM ubuntu:14.04
+#FROM ubuntu:14.04
+FROM ubuntu-lxde:1.0
 
 # Install Tomcat and create private CATALINA_BASE at '/tomcat' owned by the Tomcat user.
 # Although Ubuntu creates a "tomcat7" user, we create our own (called "tcuser") so that 
 # child images are not artificially coupled to a specific Tomcat version number and
 # filesystem write access is limited to CATALINA_BASE.
+USER root
+
 RUN DEBIAN_FRONTEND=noninteractive \
  apt-get update && \
  apt-get install -y openjdk-7-jre-headless tomcat7 tomcat7-user
 
-RUN groupadd -g 9000 tcuser && \
- useradd -d /tomcat -r -s /bin/false -g 9000 -u 9000 tcuser && \ 
- tomcat7-instance-create /tomcat && \
- chown -R tcuser:tcuser /tomcat
+RUN tomcat7-instance-create /tomcat && \
+ chown -R developer:developer /tomcat
 
 # Add volumes for volatile directories that aren't usually shared with child images.
 VOLUME ["/tomcat/logs", "/tomcat/temp", "/tomcat/work"]
@@ -33,5 +34,5 @@ ENV JAVA_OPTS -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8
 ENV CATALINA_BASE /tomcat
 
 # Drop privileges and run Tomcat.
-USER tcuser
+USER developer 
 CMD /usr/share/tomcat7/bin/catalina.sh run
